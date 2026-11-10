@@ -3,36 +3,40 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#10150e">
-  <title>Field / Blob Tracking</title>
-  <link rel="stylesheet" href="style.css">
-  <script defer src="node_modules/lucide/dist/umd/lucide.js"></script>
-  <script defer src="node_modules/tracking/build/tracking-min.js"></script>
-  <script defer src="app.js"></script>
+  <title>Blob Overlay</title>
+  <style>
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+    .controls { position: fixed; z-index: 2; left: 24px; bottom: 24px; display: flex; align-items: center; gap: 20px; padding: 10px 14px; background: #000c; border: 1px solid #d3e6af35; border-radius: 3px; color: #e4edcf; font: 9px "Courier New", monospace; }
+    .control { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+    .control input { width: 140px; margin: 0; accent-color: #c9ef9b; cursor: pointer; }
+    .control output { width: 3ch; text-align: right; }
+    @media (max-width: 600px) {
+      .controls { left: 12px; right: 12px; bottom: 12px; gap: 12px; justify-content: space-between; }
+      .control { gap: 6px; }
+      .control input { width: min(22vw, 110px); }
+    }
+  </style>
+  <script defer src="blob-overlay.js"></script>
 </head>
 <body>
-  <main>
-    <canvas id="scene" aria-label="Animated forest with live blob tracking overlays"></canvas>
-    <header>
-      <div class="identity"><span class="mark">+</span><h1>FIELD<span> / 001</span></h1></div>
-      <div class="live"><span class="dot"></span><span id="status">INITIALIZING</span></div>
-      <button id="fullscreen" class="icon-button" title="Toggle fullscreen" aria-label="Toggle fullscreen"><i data-lucide="maximize"></i></button>
-    </header>
-    <aside class="telemetry" aria-label="Tracking statistics"><span>COLOR / CONNECTED COMPONENTS</span><span id="metrics">000 REGIONS · 00 FPS</span></aside>
-    <div id="notice" role="status" hidden></div>
-    <footer>
-      <div class="caption"><h2>Foliage study</h2><span>REAL-TIME BLOB TRACKING</span></div>
-      <div class="controls">
-        <button id="pause" class="icon-button" title="Pause animation" aria-label="Pause animation"><i data-lucide="pause"></i></button>
-        <label class="source"><span>SOURCE</span><select id="source" aria-label="Source"><option value="forest">Forest study</option><option value="reference">Reference clip</option><option value="camera">Webcam</option><option value="upload">Open video...</option></select></label>
-        <label class="sensitivity"><span>THRESHOLD <output id="threshold-value">98</output></span><input id="threshold" type="range" min="70" max="210" value="98" aria-label="Detection brightness threshold"></label>
-        <label class="switch"><input id="boxes" type="checkbox" checked><span>BOXES</span></label>
-        <label class="switch"><input id="links" type="checkbox" checked><span>LINKS</span></label>
-      </div>
-      <div class="coordinates"><span id="time">00:00:00</span><span>EXPERIMENT / 01</span></div>
-    </footer>
-    <input id="file" type="file" accept="video/*" hidden>
-    <video id="video" muted playsinline loop hidden></video>
-  </main>
+  <div class="controls">
+    <label class="control">BOXES / LINES <input id="count" type="range" min="0" max="300" value="65"><output id="count-value">65</output></label>
+    <label class="control">SPEED <input id="speed" type="range" min="0" max="3" step="0.1" value="1"><output id="speed-value">1.0</output></label>
+  </div>
+  <script>
+    addEventListener('DOMContentLoaded', () => {
+      const overlay = BlobOverlay.create(document.body, { count: 65 });
+      const input = document.querySelector('#count');
+      input.addEventListener('input', () => {
+        overlay.setCount(input.value);
+        document.querySelector('#count-value').value = input.value;
+      });
+      const speedInput = document.querySelector('#speed');
+      speedInput.addEventListener('input', () => {
+        overlay.setSpeed(speedInput.value);
+        document.querySelector('#speed-value').value = Number(speedInput.value).toFixed(1);
+      });
+    });
+  </script>
 </body>
 </html>

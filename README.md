@@ -1,23 +1,38 @@
-# Field / Blob Tracking
+# Blob Overlay
 
-A full-screen browser experiment inspired by the supplied foliage tracking video. Uses tracking.js connected-component color detection, persistent region IDs, fine bounding boxes, and nearest-neighbor connections. The forest study animates a still photograph; camera and uploaded video modes process actual video frames locally.
+A dependency-free, transparent overlay that draws the tracking-style pattern (fine bounding boxes, persistent 3-digit IDs, nearest-neighbor connection lines). It no longer detects foliage; regions are generated procedurally and fed through the same ID matching and drawing code.
 
 ## Run locally
-
-Install Node.js (LTS), then open a terminal in this folder:
 
 ```powershell
 npm install
 npm start
 ```
 
-Open http://127.0.0.1:5173. Stop the server with Ctrl+C. If port 5173 is occupied, run `npx http-server . -a 127.0.0.1 -p 5174 -c-1` instead.
+Open http://127.0.0.1:5173. You get a black screen with controls (bottom-left) to set how many boxes and lines are drawn and how quickly they move and fade. Boxes keep their size and drift smoothly, while connections fade between changes. Speed 0 freezes the animation; changing the count still updates the display. You can also just double-click `index.html`.
 
-Select **Webcam** to process your camera, or **Open video...** for your own clip. Camera access requires permission and localhost or HTTPS. Nothing is uploaded. The threshold controls the brightness of green regions selected by the detector; boxes and connections can be switched independently.
+## Use in another project
 
-**Reference clip** plays the supplied video, which already contains its original baked-in tracking graphics. Those original graphics cannot be disabled by the checkboxes; newly detected overlays can.
+Copy `blob-overlay.js` into your project. It needs no other files.
 
-The default photo is from [Unsplash](https://unsplash.com/photos/trees-in-forest-with-sun-rays-6iSZzFMKQbs), served locally as `forest.jpg`. After installing dependencies and downloading the photo, the demo does not need external services.
+```html
+<script src="blob-overlay.js"></script>
+<script>
+  // Cover the whole viewport...
+  const overlay = BlobOverlay.create(document.body, { count: 65 });
+  // ...or only one element (it will be given position: relative if it is static).
+  // const overlay = BlobOverlay.create(document.querySelector('#panel'), { count: 65 });
+
+  overlay.setCount(120);   // more / fewer boxes and lines
+  overlay.setSpeed(1.5);   // 0 pauses movement; 1 is normal speed; max is 3
+  overlay.setBoxes(false); // toggle boxes
+  overlay.setLinks(false); // toggle lines
+  overlay.pause(); overlay.resume();
+  overlay.destroy();       // removes the canvas
+</script>
+```
+
+Options: `count` (default 65), `speed` (default 1, range 0–3), `boxes` (default true), `links` (default true), `zIndex` (default 1). The canvas is transparent and uses `pointer-events: none`, so the UI underneath stays clickable.
 
 ```powershell
 npm run check
